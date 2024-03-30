@@ -1,74 +1,72 @@
 import cv2
 import mediapipe as mp
 
+def sideBodyTracking(leftLeg:bool = True, rightLeg:bool = True, leftArm:bool = True, rightArm:bool = True):
+    mp_pose = mp.solutions.pose
 
-mp_drawing = mp.solutions.drawing_utils
-mp_pose = mp.solutions.pose
+    # Create Pose solution with high accuracy (static image mode)
+    pose_with_landmarks = mp_pose.Pose(min_detection_confidence=0.7, min_tracking_confidence=0.5, static_image_mode=False)
 
-# Create drawing spec for efficient drawing
-drawing_spec = mp_drawing.DrawingSpec(thickness=int(2), circle_radius=int(2), color=(0, 255, 0))
+    # Use 0 for webcam, or provide video file path
+    cap = cv2.VideoCapture(0)
 
-# Create Pose solution with high accuracy (static image mode)
-pose_with_landmarks = mp_pose.Pose(min_detection_confidence=0.7, min_tracking_confidence=0.5, static_image_mode=False)
+    # Define the indices of the right leg landmarks
+    left_leg_indices =  [25, 27, 29, 31]
+    right_leg_indices = [26, 28, 30, 32]
 
-# Use 0 for webcam, or provide video file path
-cap = cv2.VideoCapture(0)
+    # contains both right and left arm [11,12,13,14,15,16,17,18,19,20]
+    left_arm_indices = []
+    right_arm_indices = []
 
-# Define the indices of the right leg landmarks
-omitLeftLeg = True
-omitRightLeg = False
-left_leg_indices =  [25, 27, 29, 31]
-right_leg_indices = [26, 28, 30, 32]
+    while cap.isOpened():
+        success, image = cap.read()
 
-# contains both right and left arm [11,12,13,14,15,16,17,18,19,20]
-omitRightArm = False
-omitLeftArm = False
-left_arm_indices = []
-right_arm_indices = []
+        if not success:
+            print("Ignoring empty camera frame.")
+            continue
 
-while cap.isOpened():
-    success, image = cap.read()
+        # Convert the BGR image to RGB format for MediaPipe processing
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image.flags.writeable = False  # Optimize for performance
 
-    if not success:
-        print("Ignoring empty camera frame.")
-        continue
-
-    # Convert the BGR image to RGB format for MediaPipe processing
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    image.flags.writeable = False  # Optimize for performance
-
-    # Perform pose detection on the image
-    results = pose_with_landmarks.process(image)
-    
-    # Convert the image back to BGR format for display
-    image.flags.writeable = True
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-
-    # Draw pose landmarks if results are available
-    if results.pose_landmarks:
+        # Perform pose detection on the image
+        results = pose_with_landmarks.process(image)
         
-        landmarks = results.pose_landmarks.landmark
-        image_height, image_width, _ = image.shape
-        
-        for idx, landmark in enumerate(landmarks):
-            x = int(landmark.x * image_width)
-            y = int(landmark.y * image_height)
+        # Convert the image back to BGR format for display
+        image.flags.writeable = True
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+        # Draw pose landmarks if results are available
+        if results.pose_landmarks:
             
-            # Omit right leg landmarks
-            if omitLeftLeg and idx in left_leg_indices:
-                continue
-            if omitRightLeg and idx in right_leg_indices:
-                continue
+            landmarks = results.pose_landmarks.landmark
+            image_height, image_width, _ = image.shape
             
-            # Draw point on the image
-            cv2.circle(image, (x, y), 5, (0, 255, 0), -1)
+            for idx, landmark in enumerate(landmarks):
+                x = int(landmark.x * image_width)
+                y = int(landmark.y * image_height)
+                
+                # Omits certain landmarks
+                if not leftLeg and idx in left_leg_indices:
+                    continue
+                if not rightLeg and idx in right_leg_indices:
+                    continue
+                if not leftArm and idx in left_arm_indices:
+                    continue
+                if not rightArm and idx in right_arm_indices:
+                    continue
+                
+                # Draw point on the image
+                cv2.circle(image, (x, y), 5, (0, 255, 0), -1)
+            
+        # Display the resulting frame
+        cv2.imshow('MediaPipe Pose', image)
         
-    # Display the resulting frame
-    cv2.imshow('MediaPipe Pose', image)
-    
-    # Exit on 'q' key press
-    if cv2.waitKey(5) & 0xFF == ord('q'):
-        break
+        # Exit on 'q' key press
+        if cv2.waitKey(5) & 0xFF == ord('q'):
+            break
 
-cap.release()
-cv2.destroyAllWindows()
+    cap.release()
+    cv2.destroyAllWindows()
+    
+sideBodyTracking()
