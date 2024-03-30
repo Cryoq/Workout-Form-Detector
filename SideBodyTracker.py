@@ -1,7 +1,7 @@
 import cv2
 import mediapipe as mp
 
-def sideBodyTracking(leftLeg:bool = True, rightLeg:bool = True, leftArm:bool = True, rightArm:bool = True):
+def sideBodyTracking(leftLeg:bool = True, rightLeg:bool = True, leftArm:bool = True, rightArm:bool = True, debug:bool = False):
     mp_pose = mp.solutions.pose
 
     # Create Pose solution with high accuracy (static image mode)
@@ -56,6 +56,9 @@ def sideBodyTracking(leftLeg:bool = True, rightLeg:bool = True, leftArm:bool = T
                 if not rightArm and idx in right_arm_indices:
                     continue
                 
+                if debug:
+                    print(f"Landmark: {idx}: x={x}, y={y}")
+                
                 # Draw point on the image
                 cv2.circle(image, (x, y), 5, (0, 255, 0), -1)
             
@@ -68,3 +71,5 @@ def sideBodyTracking(leftLeg:bool = True, rightLeg:bool = True, leftArm:bool = T
 
     cap.release()
     cv2.destroyAllWindows()
+    
+sideBodyTracking()
