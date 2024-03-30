@@ -68,5 +68,3 @@ def sideBodyTracking(leftLeg:bool = True, rightLeg:bool = True, leftArm:bool = T
 
     cap.release()
     cv2.destroyAllWindows()
-    
-sideBodyTracking()
