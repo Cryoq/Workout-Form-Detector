@@ -9,6 +9,7 @@ def sideBodyTracking(leftLeg:bool = True, rightLeg:bool = True, leftArm:bool = T
 
     # Use 0 for webcam, or provide video file path
     cap = cv2.VideoCapture(0)
+    #a
 
     # Define the indices of the right leg landmarks
     left_leg_indices =  [25, 27, 29, 31]
