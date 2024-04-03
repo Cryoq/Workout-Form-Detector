@@ -1,7 +1,7 @@
 import cv2
 import mediapipe as mp
 
-def sideBodyTracking(leftLeg:bool = True, rightLeg:bool = True, leftArm:bool = True, rightArm:bool = True, debug:bool = False):
+def sideBodyTracking(leftLeg:bool = True, rightLeg:bool = True, leftArm:bool = True, rightArm:bool = True, face:bool = False, debug:bool = False):
     mp_pose = mp.solutions.pose
 
     # Create Pose solution with high accuracy (static image mode)
@@ -15,8 +15,11 @@ def sideBodyTracking(leftLeg:bool = True, rightLeg:bool = True, leftArm:bool = T
     right_leg_indices = [26, 28, 30, 32]
 
     # contains both right and left arm [11,12,13,14,15,16,17,18,19,20]
-    left_arm_indices = []
-    right_arm_indices = []
+    left_arm_indices = [11,13,15,17,19,21]
+    right_arm_indices = [12,14,16,18,20,22]
+    
+    face_indicies = [1,2,3,4,5,6,7,8,9,10]
+    
 
     while cap.isOpened():
         success, image = cap.read()
@@ -55,6 +58,8 @@ def sideBodyTracking(leftLeg:bool = True, rightLeg:bool = True, leftArm:bool = T
                     continue
                 if not rightArm and idx in right_arm_indices:
                     continue
+                if not face and idx in face_indicies:
+                    continue
                 
                 if debug:
                     print(f"Landmark: {idx}: x={x}, y={y}")
@@ -71,3 +76,5 @@ def sideBodyTracking(leftLeg:bool = True, rightLeg:bool = True, leftArm:bool = T
 
     cap.release()
     cv2.destroyAllWindows()
+    
+sideBodyTracking(leftArm=False)
