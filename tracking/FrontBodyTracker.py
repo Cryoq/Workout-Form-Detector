@@ -105,3 +105,5 @@ def frontBodyTracking(debug:bool = False):
 
     cap.release()
     cv2.destroyAllWindows()
+    
+frontBodyTracking()

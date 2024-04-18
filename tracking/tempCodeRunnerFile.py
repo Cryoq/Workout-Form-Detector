@@ -1,1 +1,1 @@
-mediapipe.python.solutions.drawing_utils
+            torso = [landmarks[mp_pose.PoseLandmark.CHEST.value].x,landmarks[mp_pose.PoseLandmark.CHEST.value].y]
