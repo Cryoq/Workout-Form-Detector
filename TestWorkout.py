@@ -1,3 +1,4 @@
+'''
 from tracking.WorkoutClass import workout
 from statistics import mean
 
@@ -38,4 +39,8 @@ while running:
     
     print(f"Your on rep: {rep}")
     
-    
+'''
+import numpy as np
+a = np.load("3PointsWorkout_data.npy")
+x = np.ndarray.tolist(a)
+print(x)

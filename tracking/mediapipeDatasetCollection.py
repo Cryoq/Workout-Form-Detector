@@ -86,4 +86,4 @@ def frontBodyTracking(videopath, debug:bool = False):
     cap.release()
     cv2.destroyAllWindows()
     
-frontBodyTracking("C:/Users/aland/OneDrive/Documents/Test-Workout-Video.mp4")
+frontBodyTracking("C:/Users/aland/OneDrive/Documents/Test-Workout-Video2.mp4")
