@@ -42,5 +42,6 @@ while running:
 '''
 import numpy as np
 a = np.load("3PointsWorkout_data.npy")
+print(a)
 x = np.ndarray.tolist(a)
 print(x)
