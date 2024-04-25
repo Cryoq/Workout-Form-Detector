@@ -1,6 +1,8 @@
-'''
 from tracking.WorkoutClass import workout
 from statistics import mean
+import pickle
+
+model = pickle.loads("curlmodel.pkl")
 
 curl = workout(side=False, front=True)
 
@@ -38,10 +40,3 @@ while running:
         curlUp = False
     
     print(f"Your on rep: {rep}")
-    
-'''
-import numpy as np
-a = np.load("3PointsWorkout_data.npy")
-print(a)
-x = np.ndarray.tolist(a)
-print(x)
