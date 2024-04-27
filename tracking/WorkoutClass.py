@@ -23,7 +23,9 @@ class workout:
     
     def setupCamera(self):
         # 0 used for webcam, or provide a file path
+        print("L")
         self.cap = cv2.VideoCapture(0)
+        print("Y")
         
     def excludeLandmarks(self,leftLeg=True, rightLeg=True, leftArm=True, rightArm=True, face=False):
 
@@ -88,6 +90,7 @@ class workout:
     
     # Returns Specific points to be used for model
     def returnPoints(self):
+        print(f"shoulder: {self.shoulder}\n wrist: {self.wrist}\n elbow: {self.elbow}")
         return self.shoulder, self.wrist, self.elbow
     
     def curl(self):
@@ -105,3 +108,4 @@ class workout:
             angle = 360 - angle
         
         return angle
+    

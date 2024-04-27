@@ -1,13 +1,24 @@
 from tracking.WorkoutClass import workout
 from statistics import mean
-import pickle
+import numpy as np
 
-model = pickle.loads("curlmodel.pkl")
+def form(currentX, X_train):
+    distances = np.linalg.norm(X_train - currentX, axis=1)
 
-curl = workout(side=False, front=True)
+    nearest_neighbor_idx = np.argmin(distances)
+    print(nearest_neighbor_idx)
+
+    return distances[nearest_neighbor_idx]
+
+
+X_train = np.load("data/3PointsWorkout_data.npy")
+
+curl = workout(side=True, front=False)
 
 curl.setupCamera()
-#curl.excludeLandmarks(rightArm=False)
+
+# If you are doing from side
+curl.excludeLandmarks(rightArm=False)
 angles = []
 buffer = 0
 
@@ -17,9 +28,24 @@ curlUp = False
 rep = 0
 
 while running:
+    
+    #print("HEllo")
     curl.oneFrame()
+    #print("TSET")
+    
     shoulder, wrist, elbow = curl.returnPoints()
-    print(f"shoulder: {shoulder}\nwrist: {wrist}\nelbow: {elbow}")
+    
+    current_X = np.array([shoulder[0],shoulder[1], wrist[0], wrist[1], elbow[0], elbow[1]])
+    
+    distance = form(current_X, X_train)
+
+    print(f"Distance to nearest trained data point: {distance}")
+
+    
+    #print("After points returned")
+    
+    #print(f"shoulder: {shoulder}\nwrist: {wrist}\nelbow: {elbow}")
+    
     angle = curl.curl()
     if buffer < 3:
         angles.append(angle)
@@ -32,6 +58,7 @@ while running:
         print("Up")
     angles = []
     buffer = 0
+    
     
     if angle <= 35.0 and not curlUp:
         rep += 1
