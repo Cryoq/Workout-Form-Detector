@@ -23,9 +23,7 @@ class workout:
     
     def setupCamera(self):
         # 0 used for webcam, or provide a file path
-        print("L")
         self.cap = cv2.VideoCapture(0)
-        print("Y")
         
     def excludeLandmarks(self,leftLeg=True, rightLeg=True, leftArm=True, rightArm=True, face=False):
 
@@ -81,6 +79,8 @@ class workout:
             self.mp_drawing.draw_landmarks(image, results.pose_landmarks, connections=self.customConnections, landmark_drawing_spec=self.customStyle)
             
         # Displays the camera
+        #cv2.flip().tostring
+        
         cv2.imshow("Workout Form Detector", image)
         
         # Exits program if the 'q' key is pressed
@@ -90,7 +90,7 @@ class workout:
     
     # Returns Specific points to be used for model
     def returnPoints(self):
-        print(f"shoulder: {self.shoulder}\n wrist: {self.wrist}\n elbow: {self.elbow}")
+        #print(f"shoulder: {self.shoulder}\n wrist: {self.wrist}\n elbow: {self.elbow}")
         return self.shoulder, self.wrist, self.elbow
     
     def curl(self):

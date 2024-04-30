@@ -7,9 +7,6 @@ def frontBodyTracking(videopath, debug:bool = False):
     mp_drawing = mp.solutions.drawing_utils
     mp_pose = mp.solutions.pose
     landmarkDataset = []
-    
-    # Column for csv file
-    landmarkCol = ['wrist', 'elbow', 'shoulder']
 
     # Create drawing spec for efficient drawing
     drawing_spec = mp_drawing.DrawingSpec(thickness=int(2), circle_radius=int(2), color=(0, 255, 0))
@@ -26,7 +23,7 @@ def frontBodyTracking(videopath, debug:bool = False):
             print("End of Video.")
             
             print(landmarkDataset)
-            np.save("3PointsWorkout_data.npy", np.array(landmarkDataset))
+            np.save("data/leftCurlPoints.npy", np.array(landmarkDataset))
             
             break
 
@@ -63,7 +60,7 @@ def frontBodyTracking(videopath, debug:bool = False):
             print(f'Elbow: x:{elbow[0]}\t y:{elbow[1]}')
             
             # Appends data to landmarks
-            landmarkDataset.append([wrist[0], wrist[1], elbow[0], elbow[1], leftShoulder[0], leftShoulder[1]])
+            landmarkDataset.append([wrist, elbow, leftShoulder])
             
         # Converts the landmarkDataset list to pd dataframe and converts and appends it to csv file
         #landmarks_df = pd.DataFrame(landmarkDataset)
@@ -85,4 +82,4 @@ def frontBodyTracking(videopath, debug:bool = False):
     cap.release()
     cv2.destroyAllWindows()
     
-frontBodyTracking("C:/Users/aland/OneDrive/Documents/Test-Workout-Video2.mp4")
+frontBodyTracking("C:/Users/aland/OneDrive/Pictures/Camera Roll/LeftBicepCurl.mp4")
