@@ -77,13 +77,10 @@ class workout:
             self.mp_drawing.draw_landmarks(image, results.pose_landmarks, connections=self.mp_pose.POSE_CONNECTIONS, landmark_drawing_spec=self.drawing_spec)
         if self.side:
             self.mp_drawing.draw_landmarks(image, results.pose_landmarks, connections=self.customConnections, landmark_drawing_spec=self.customStyle)
-        
-        cv2.imshow("Workout Form Detector", image)
-        
-        # Exits program if the 'q' key is pressed
-        if cv2.waitKey(5) & 0xFF == ord('q'):
-            self.cap.release()
-            cv2.destroyAllWindows()
+            
+        return image
+            
+            
     
     # Returns Specific points to be used for model
     def returnPoints(self):

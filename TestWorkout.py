@@ -25,12 +25,12 @@ def calculate_distance(realtime_keypoints, dataset):
 
 leftCurlPoints = np.load("data/leftCurlPoints.npy")
 
-curl = workout(side=True, front=False)
+#curl = workout(side=True, front=False)
 
-curl.setupCamera()
+#curl.setupCamera()
 
 # If you are doing from side
-curl.excludeLandmarks(rightArm=False)
+#curl.excludeLandmarks(rightArm=False)
 angles = []
 buffer = 0
 
@@ -47,7 +47,7 @@ running = True
 curlUp = False
 
 rep = 0
-
+'''
 while running:
     
     curl.oneFrame()
@@ -68,15 +68,11 @@ while running:
         angles.append(angle)
         distanceList.append(distance)
         buffer += 1
-        #print(angles)
-        
     if buffer >= 3:
-        
         if mean(angles) > angles[0]:
             print("Down")
         else:
             print("Up")
-        
         if mean(distanceList) < maxGoodForm:
             goodForm = True
             okForm = False
@@ -108,3 +104,4 @@ while running:
         curlUp = False
     
     print(f"Your on rep: {rep}")
+'''
