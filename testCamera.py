@@ -12,7 +12,6 @@ def calculate_euclidean_distance(keypoints1, keypoints2):
 # Assuming dataset is your dataset loaded from the npy file
 def calculate_distance(realtime_keypoints, dataset):
     min_distance = float('inf')
-    closest_point = None
 
     # Iterate through dataset
     for data_point in dataset:
@@ -21,7 +20,6 @@ def calculate_distance(realtime_keypoints, dataset):
         # Check if this distance is smaller than previous min_distance
         if distance < min_distance:
             min_distance = distance
-            closest_point = data_point
 
     return min_distance
 
