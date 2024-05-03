@@ -9,7 +9,6 @@ def calculate_euclidean_distance(keypoints1, keypoints2):
     # Calculate Euclidean distance between two sets of keypoints
     return np.linalg.norm(keypoints1 - keypoints2)
 
-# Assuming dataset is your dataset loaded from the npy file
 def calculate_distance(realtime_keypoints, dataset):
     min_distance = float('inf')
     
@@ -27,7 +26,6 @@ screen_width = 800
 screen_height = 600
 
 Window_Size = (screen_width, screen_width)
-# MediaPipe setup
 
 surface = pygame.display.set_mode((screen_width, screen_height))
 pygame.init()
