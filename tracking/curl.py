@@ -3,7 +3,7 @@ import mediapipe as mp
 import numpy as np
 from tracking.exclusionLandmarks import *
 from mediapipe.python.solutions.drawing_utils import DrawingSpec
-from mediapipe.python.solutions.pose import PoseLandmark
+from statistics import mean
 
 class workout:
     def __init__(self,front:bool,side:bool) -> None:
@@ -20,6 +20,19 @@ class workout:
             self.customConnections = list(self.mp_pose.POSE_CONNECTIONS)
         else:
             self.drawing_spec = self.mp_drawing.DrawingSpec(thickness=int(2), circle_radius=int(2), color=(0,255,0))
+            
+
+        # For the workout part
+        self.buffer = 0
+
+        self.distanceList = []
+
+        self.maxGoodForm = 0.09
+        self.maxOkForm = 0.11
+
+        self.curlUp = False
+
+        self.rep = 0
     
     def setupCamera(self):
         # 0 used for webcam, or provide a file path
@@ -67,9 +80,13 @@ class workout:
             landmarks = results.pose_landmarks.landmark
             
             # Sets the x,y position for shoulder, wrist, and elbow
-            self.shoulder = [landmarks[self.mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,landmarks[self.mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
-            self.wrist = [landmarks[self.mp_pose.PoseLandmark.LEFT_WRIST.value].x,landmarks[self.mp_pose.PoseLandmark.LEFT_WRIST.value].y]
-            self.elbow = [landmarks[self.mp_pose.PoseLandmark.LEFT_ELBOW.value].x,landmarks[self.mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
+            self.leftShoulder = [landmarks[self.mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,landmarks[self.mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
+            self.leftWrist = [landmarks[self.mp_pose.PoseLandmark.LEFT_WRIST.value].x,landmarks[self.mp_pose.PoseLandmark.LEFT_WRIST.value].y]
+            self.leftElbow = [landmarks[self.mp_pose.PoseLandmark.LEFT_ELBOW.value].x,landmarks[self.mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
+            
+            self.rightShoulder = [landmarks[self.mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,landmarks[self.mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+            self.rightWrist = [landmarks[self.mp_pose.PoseLandmark.RIGHT_WRIST.value].x,landmarks[self.mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
+            self.rightElbow = [landmarks[self.mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,landmarks[self.mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
             
         # If the front is being used, use normal connections/landmarks
         # If the side  is being used, use custom connections/landmarks 
@@ -80,15 +97,51 @@ class workout:
             
         return image
             
-            
+        
     
     # Returns Specific points to be used for model
-    def returnPoints(self):
-        #print(f"shoulder: {self.shoulder}\n wrist: {self.wrist}\n elbow: {self.elbow}")
-        return self.shoulder, self.wrist, self.elbow
+    def returnPoints(self, leftCurl = False, rightCurl = False):
+        if leftCurl:
+            return self.leftWrist, self.leftElbow, self.leftShoulder
+        elif rightCurl:
+            return self.rightWrist, self.rightElbow, self.rightShoulder
     
-    def curl(self):
-        return self.calculateAngle(self.shoulder, self.elbow, self.wrist)
+    def curl(self, distance, point1, point2, point3):
+        angle = self.calculateAngle(point1, point2, point3)
+        if self.buffer < 3:
+            self.distanceList.append(distance)
+            self.buffer += 1
+            
+            if mean(self.distanceList) < self.maxGoodForm:
+                goodForm = True
+                okForm = False
+                badForm = False
+            elif mean(self.distanceList) < self.maxOkForm:
+                goodForm = False
+                okForm = True
+                badForm = False
+            else:
+                goodForm = False
+                okForm = False
+                badForm = True
+                
+            if goodForm:
+                form = "You have great form"
+            elif okForm:
+                form = "Your form is ok"
+            elif badForm:
+                form = "Your form is terrible"
+            
+            self.distanceList = []
+            self.buffer = 0
+
+        if angle <= 35.0 and not self.curlUp:
+            self.rep += 1
+            self.curlUp = True
+        elif angle >= 160 and self.curlUp:
+            self.curlUp = False
+
+        return form, self.rep
     
     def calculateAngle(self,a,b,c):
         a = np.array(a)
