@@ -3,6 +3,7 @@ import mediapipe as mp
 import numpy as np
 from tracking.exclusionLandmarks import *
 from mediapipe.python.solutions.drawing_utils import DrawingSpec
+from mediapipe.python.solutions.pose import PoseLandmark
 from statistics import mean
 
 class workout:
@@ -27,8 +28,8 @@ class workout:
 
         self.distanceList = []
 
-        self.maxGoodForm = 0.09
-        self.maxOkForm = 0.11
+        self.maxGoodForm = 0.19
+        self.maxOkForm = 0.21
 
         self.curlUp = False
 
@@ -126,11 +127,11 @@ class workout:
                 badForm = True
                 
             if goodForm:
-                form = "You have great form"
+                form = "Great"
             elif okForm:
-                form = "Your form is ok"
+                form = "Good"
             elif badForm:
-                form = "Your form is terrible"
+                form = "Bad"
             
             self.distanceList = []
             self.buffer = 0

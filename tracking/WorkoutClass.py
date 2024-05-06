@@ -77,6 +77,9 @@ class workout:
             self.mp_drawing.draw_landmarks(image, results.pose_landmarks, connections=self.mp_pose.POSE_CONNECTIONS, landmark_drawing_spec=self.drawing_spec)
         if self.side:
             self.mp_drawing.draw_landmarks(image, results.pose_landmarks, connections=self.customConnections, landmark_drawing_spec=self.customStyle)
+            
+        # Displays the camera
+        #cv2.flip().tostring
         
         cv2.imshow("Workout Form Detector", image)
         
