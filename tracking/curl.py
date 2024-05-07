@@ -8,12 +8,16 @@ from statistics import mean
 
 class workout:
     def __init__(self,front:bool,side:bool) -> None:
+        
         self.mp_pose = mp.solutions.pose
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_drawing_styles = mp.solutions.drawing_styles
         self.pose_with_landmarks = self.mp_pose.Pose(min_detection_confidence=0.7, min_tracking_confidence=0.5, static_image_mode=False)
+        
+        # Mainly used for when you want to use the normal points or custom points
         self.front = front
         self.side = side
+        
         # If you are using the camera from the side, we will use custom points 
         # so we can get rid unused points as they like to spaz out
         if self.side:
@@ -22,7 +26,6 @@ class workout:
         else:
             self.drawing_spec = self.mp_drawing.DrawingSpec(thickness=int(2), circle_radius=int(2), color=(0,255,0))
             
-
         # For the workout part
         self.buffer = 0
 
@@ -32,27 +35,26 @@ class workout:
         self.maxOkForm = 0.21
 
         self.curlUp = False
-
         self.rep = 0
+        self.prevAngle = 0
+        
+        self.speedList = []
+        self.form = ['Great', 'good', 'bad', 'terrible']
+        self.formIndex = 0
     
     def setupCamera(self):
-        # 0 used for webcam, or provide a file path
+        # 0 used for webcam, 1 used for seperate camera
         self.cap = cv2.VideoCapture(0)
         
     def excludeLandmarks(self,leftLeg=True, rightLeg=True, leftArm=True, rightArm=True, face=False):
 
         # Appends all excluded landmarks into a list
-        excludedLandmarks = []    
-        if not leftLeg:
-            excludedLandmarks.extend(leftLegLandmarks)
-        if not rightLeg:
-            excludedLandmarks.extend(rightLegLandmarks)
-        if not leftArm:
-            excludedLandmarks.extend(leftArmLandmarks)
-        if not rightArm:
-            excludedLandmarks.extend(rightArmLandmarks)
-        if not face:
-            excludedLandmarks.extend(faceLandmarks)
+        excludedLandmarks = []
+        points = [leftLeg, rightLeg, leftArm, rightArm, face]
+        
+        for index,bodyPart in enumerate(points):
+            if not bodyPart:
+                excludedLandmarks.extend(exLandmarks[index])
 
         # Sets all excluded landmarks to be unseen
         for landmark in excludedLandmarks:
@@ -80,25 +82,25 @@ class workout:
         if results.pose_landmarks:
             landmarks = results.pose_landmarks.landmark
             
-            # Sets the x,y position for shoulder, wrist, and elbow
-            self.leftShoulder = [landmarks[self.mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,landmarks[self.mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
-            self.leftWrist = [landmarks[self.mp_pose.PoseLandmark.LEFT_WRIST.value].x,landmarks[self.mp_pose.PoseLandmark.LEFT_WRIST.value].y]
-            self.leftElbow = [landmarks[self.mp_pose.PoseLandmark.LEFT_ELBOW.value].x,landmarks[self.mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
+            # Gets LEFT shoulder, wrist, elbow (x,y) Values
+            self.leftShoulder = self.getPoints(landmarks, "LEFT_SHOULDER")
+            self.leftWrist = self.getPoints(landmarks, "LEFT_WRIST")
+            self.leftElbow = self.getPoints(landmarks, "LEFT_ELBOW")
             
-            self.rightShoulder = [landmarks[self.mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,landmarks[self.mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
-            self.rightWrist = [landmarks[self.mp_pose.PoseLandmark.RIGHT_WRIST.value].x,landmarks[self.mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
-            self.rightElbow = [landmarks[self.mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,landmarks[self.mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
+            # Gets RIGHT shoulder, wrist, elbow (x,y) Values
+            self.rightShoulder = self.getPoints(landmarks, "RIGHT_SHOULDER")
+            self.rightWrist = self.getPoints(landmarks, "RIGHT_WRIST")
+            self.rightElbow = self.getPoints(landmarks, "RIGHT_ELBOW")
             
         # If the front is being used, use normal connections/landmarks
-        # If the side  is being used, use custom connections/landmarks 
         if self.front:
             self.mp_drawing.draw_landmarks(image, results.pose_landmarks, connections=self.mp_pose.POSE_CONNECTIONS, landmark_drawing_spec=self.drawing_spec)
+        
+        # If the side  is being used, use custom connections/landmarks    
         if self.side:
             self.mp_drawing.draw_landmarks(image, results.pose_landmarks, connections=self.customConnections, landmark_drawing_spec=self.customStyle)
             
         return image
-            
-        
     
     # Returns Specific points to be used for model
     def returnPoints(self, leftCurl = False, rightCurl = False):
@@ -109,29 +111,28 @@ class workout:
     
     def curl(self, distance, point1, point2, point3):
         angle = self.calculateAngle(point1, point2, point3)
+        
+        vel = np.diff(np.array([angle, self.prevAngle]))
+        self.prevAngle = angle
+        
+        if vel > 9 or vel < -9:
+            self.speedList.append("Fast")
+        else:
+            self.speedList.append("Good")
+        
+        if len(self.speedList) > 7:
+            self.speedList.pop(0)
+        
         if self.buffer < 3:
             self.distanceList.append(distance)
             self.buffer += 1
             
             if mean(self.distanceList) < self.maxGoodForm:
-                goodForm = True
-                okForm = False
-                badForm = False
+                self.formIndex = 0
             elif mean(self.distanceList) < self.maxOkForm:
-                goodForm = False
-                okForm = True
-                badForm = False
+                self.formIndex = 1
             else:
-                goodForm = False
-                okForm = False
-                badForm = True
-                
-            if goodForm:
-                form = "Great"
-            elif okForm:
-                form = "Good"
-            elif badForm:
-                form = "Bad"
+                self.formIndex = 2
             
             self.distanceList = []
             self.buffer = 0
@@ -141,6 +142,14 @@ class workout:
             self.curlUp = True
         elif angle >= 160 and self.curlUp:
             self.curlUp = False
+        
+        if self.speedList.count("Fast") > 3:
+            self.formIndex += 1
+        
+        form = self.form[self.formIndex]   
+            
+        if self.speedList.count("Fast") > 3:
+            form += " and Uncontrolled"
 
         return form, self.rep
     
@@ -157,3 +166,4 @@ class workout:
         
         return angle
     
+    getPoints = lambda self, landmarks, point: [landmarks[self.mp_pose.PoseLandmark[point].value].x,landmarks[self.mp_pose.PoseLandmark[point].value].y] 

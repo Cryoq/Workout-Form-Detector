@@ -1,37 +1,39 @@
 from mediapipe.python.solutions.pose import PoseLandmark
 
-leftLegLandmarks = [
+exLandmarks = [
+    # Left Leg landmarks
+    [
     PoseLandmark.LEFT_ANKLE,
     PoseLandmark.LEFT_HEEL,
     PoseLandmark.LEFT_HIP,
     PoseLandmark.LEFT_KNEE
-]
-
-rightLegLandmarks = [
+], 
+    # Right Leg Landmarks
+    [
     PoseLandmark.RIGHT_ANKLE,
     PoseLandmark.RIGHT_HEEL,
     PoseLandmark.RIGHT_HIP,
     PoseLandmark.RIGHT_KNEE
-]
-
-leftArmLandmarks = [
+],
+    # Left Arm Landmarks
+    [
     PoseLandmark.LEFT_ELBOW,
     PoseLandmark.LEFT_PINKY,
     PoseLandmark.LEFT_SHOULDER,
     PoseLandmark.LEFT_THUMB,
     PoseLandmark.LEFT_WRIST
-]
-
-rightArmLandmarks = [
+],
+    # Right Arm Landmarks
+    [
     PoseLandmark.RIGHT_ELBOW,
     PoseLandmark.RIGHT_PINKY,
     PoseLandmark.RIGHT_SHOULDER,
     PoseLandmark.RIGHT_THUMB,
     PoseLandmark.RIGHT_WRIST,
     PoseLandmark.RIGHT_INDEX
-]
-
-faceLandmarks = [
+],
+    # Face Landmarks
+    [
     PoseLandmark.LEFT_EYE, 
     PoseLandmark.RIGHT_EYE, 
     PoseLandmark.LEFT_EYE_INNER, 
@@ -42,4 +44,4 @@ faceLandmarks = [
     PoseLandmark.RIGHT_EYE_OUTER,
     PoseLandmark.MOUTH_LEFT,
     PoseLandmark.MOUTH_RIGHT
-]
+]]

@@ -11,8 +11,7 @@ def calculate_euclidean_distance(keypoints1, keypoints2):
 
 def calculate_distance(realtime_keypoints, dataset):
     min_distance = float('inf')
-    closest_index = None
-
+    
     # Iterate through dataset
     for i, data_point in enumerate(dataset):
         # Calculate distance between each dataset point and real-time keypoints
@@ -20,9 +19,8 @@ def calculate_distance(realtime_keypoints, dataset):
         # Check if this distance is smaller than previous min_distance
         if distance < min_distance:
             min_distance = distance
-            closest_index = i
 
-    return min_distance, closest_index
+    return min_distance
 
 
 screen_width = 800
@@ -63,7 +61,7 @@ def open_camera_screen(workout) -> None:
             # Calculates distance between good form dataset and real-time form data
             Lwrist, Lelbow, Lshoulder = workout.returnPoints(True, False)
             realtime_keypoints = np.array([Lwrist, Lelbow, Lshoulder])
-            distance, closest_index = calculate_distance(realtime_keypoints, leftCurlPoints)
+            distance = calculate_distance(realtime_keypoints, leftCurlPoints)
             print("Distance", distance)
             
             
@@ -71,8 +69,8 @@ def open_camera_screen(workout) -> None:
             
             form, rep = workout.curl(distance, Lwrist, Lelbow, Lshoulder)
             
-            print(form)
-            print(f"You are on rep {rep}")
+            #print(form)
+            #print(f"You are on rep {rep}")
         except:
             pass
         

@@ -1,9 +1,6 @@
 from tracking.WorkoutClass import workout
 from statistics import mean
 import numpy as np
-import pickle
-from sklearn.preprocessing import StandardScaler
-from sklearn.exceptions import NotFittedError
 from time import time
 
 
@@ -27,11 +24,6 @@ def calculate_distance(realtime_keypoints, dataset):
 
     return min_distance, closest_point
 
-with open('best_svm_model.pkl', 'rb') as f:
-    loaded_model = pickle.load(f)
-    
-scaler = StandardScaler()
-
 
 curl = workout(side=True, front=False)
 
@@ -54,27 +46,9 @@ while running:
     curl.oneFrame()
 
 
-    try:
-        shoulder, wrist, elbow = curl.returnPoints()
-        angle = curl.curl()
-        
-        realtime_features = np.array(angles)
-        scaler.fit(realtime_features)
-        realtime_features = scaler.transform(realtime_features)
-
-        # Reshape for SVM model (assuming 1 sample)
-        realtime_features_reshaped = realtime_features.reshape(1, -1)
-        print(realtime_features_reshaped)
-
-        # Scale features if used during training
-        realtime_features_scaled = scaler.transform(realtime_features_reshaped)
-
-        # Make prediction using the loaded SVM model
-        predicted_class = loaded_model.predict(realtime_features_scaled)[0]
-        
-        print(predicted_class)
-    except Exception as f:
-        print(f)
+    
+    shoulder, wrist, elbow = curl.returnPoints()
+    angle = curl.curl()
         
     
 
