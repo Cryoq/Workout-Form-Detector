@@ -66,20 +66,18 @@ def text(text, font, text_color, x, y):
     put_text = font.render(text, True, text_color)
     surface.blit(put_text, (x, y))
     
-def draw(frame, form, reps):
+def draw(frame):
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  
     frame = np.rot90(frame)
     frame = pygame.surfarray.make_surface(frame)
     surface.blit(frame, (screen_width/10, screen_height/10))
-    text(f'Form: {form}',text_font, (255,255,255), screen_width/6, screen_height-70)
-    text(f'Rep:{reps}',text_font, (255,255,255), screen_width/2, screen_height-70)
-    pygame.display.flip()
 
 def open_camera_screen(workout) -> None:
     """
     Function to open a new screen with camera feed.
     """
-    
+    form = ''
+    rep = 0
     global side
     workout.setupCamera()  # Initialize camera capture
     
@@ -96,19 +94,26 @@ def open_camera_screen(workout) -> None:
                 
             # runs one frame of the workout 
             frame = workout.oneFrame()
-                            
-            # Calculates distance between good form dataset and real time form data
-            Lwrist, Lelbow, Lshoulder = workout.returnPoints(True, False)
-            realtime_keypoints = np.array([Lwrist, Lelbow, Lshoulder])
-            distance = calculate_distance(realtime_keypoints, leftCurlPoints)
-            print("Distance", distance)
-                
-            # The main curl workout part
-            form, rep = workout.curl(distance, Lwrist, Lelbow, Lshoulder)    
+                        
+            try:
+                # Calculates distance between good form dataset and real time form data
+                Lwrist, Lelbow, Lshoulder = workout.returnPoints(True, False)
+                realtime_keypoints = np.array([Lwrist, Lelbow, Lshoulder])
+                distance = calculate_distance(realtime_keypoints, leftCurlPoints)
+                print("Distance", distance)
+                    
+                # The main curl workout part
+                form, rep = workout.curl(distance, Lwrist, Lelbow, Lshoulder)    
+            except:
+                pass
 
             if frame is not None:
                 # Converts cv2 frame to work with pygame and blits it onto the screen
-                draw(frame, form, rep)
+                draw(frame)
+                text(f'Form: {form}',text_font, (255,255,255), screen_width/6, screen_height-70)
+                text(f'Rep:{rep}',text_font, (255,255,255), screen_width/2, screen_height-70)
+                
+                pygame.display.flip()
             
     if side == "Right Curl":
         workout_instance.excludeLandmarks(leftArm=False) 
@@ -117,21 +122,27 @@ def open_camera_screen(workout) -> None:
                 if event.type == pygame.QUIT:
                     running = False
                 
-                # runs one frame of the workout 
+            # runs one frame of the workout 
             frame = workout.oneFrame()
                 
-            # Calculates distance between good form dataset and real time form data
-            Rwrist, Relbow, Rshoulder = workout.returnPoints(False, True)
-            realtime_keypoints = np.array([Rwrist, Relbow, Rshoulder])
-            distance = calculate_distance(realtime_keypoints, rightCurlPoints)
-            print("Distance", distance)
-                
-            # The main curl workout part
-            form, rep = workout.curl(distance, Rwrist, Relbow, Rshoulder)    
+            try:
+                # Calculates distance between good form dataset and real time form data
+                Rwrist, Relbow, Rshoulder = workout.returnPoints(False, True)
+                realtime_keypoints = np.array([Rwrist, Relbow, Rshoulder])
+                distance = calculate_distance(realtime_keypoints, rightCurlPoints)
+                print("Distance", distance)
+                    
+                # The main curl workout part
+                form, rep = workout.curl(distance, Rwrist, Relbow, Rshoulder)
+            except:
+                pass
             
             if frame is not None:
                 # Converts cv2 frame to work with pygame and blits it onto the screen
-                draw(frame, form, rep)
+                draw(frame)
+                text(f'Form: {form}',text_font, (255,255,255), screen_width/6, screen_height-70)
+                text(f'Rep:{rep}',text_font, (255,255,255), screen_width/2, screen_height-70)
+                pygame.display.flip()
 
 main_menu_theme = pygame_menu.themes.THEME_GREEN.copy()
 main_menu_theme.set_background_color_opacity(0.5)

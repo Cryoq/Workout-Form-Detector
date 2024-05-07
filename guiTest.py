@@ -49,6 +49,7 @@ def open_camera_screen(workout) -> None:
     
     reps = text_font.render(f"Reps: {rep}", True, (255,255,255))
     form = text_font.render(f"Form: {form}", True, (255,255,255))
+    
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

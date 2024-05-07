@@ -3,7 +3,6 @@ import mediapipe as mp
 import numpy as np
 from tracking.exclusionLandmarks import *
 from mediapipe.python.solutions.drawing_utils import DrawingSpec
-from mediapipe.python.solutions.pose import PoseLandmark
 from statistics import mean
 
 class workout:
