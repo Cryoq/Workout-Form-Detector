@@ -20,11 +20,6 @@ class workout:
         
         # If you are using the camera from the side, we will use custom points 
         # so we can get rid unused points as they like to spaz out
-        if self.side:
-            self.customStyle = self.mp_drawing_styles.get_default_pose_landmarks_style()
-            self.customConnections = list(self.mp_pose.POSE_CONNECTIONS)
-        else:
-            self.drawing_spec = self.mp_drawing.DrawingSpec(thickness=int(2), circle_radius=int(2), color=(0,255,0))
             
         # For the workout part
         self.buffer = 0
@@ -47,7 +42,14 @@ class workout:
         self.cap = cv2.VideoCapture(0)
         
     def excludeLandmarks(self,leftLeg=True, rightLeg=True, leftArm=True, rightArm=True, face=False):
-
+        
+        if self.side:
+            self.customStyle = self.mp_drawing_styles.get_default_pose_landmarks_style()
+            self.customConnections = list(self.mp_pose.POSE_CONNECTIONS)
+        else:
+            self.drawing_spec = self.mp_drawing.DrawingSpec(thickness=int(2), circle_radius=int(2), color=(0,255,0))
+            
+            
         # Appends all excluded landmarks into a list
         excludedLandmarks = []
         points = [leftLeg, rightLeg, leftArm, rightArm, face]
@@ -102,7 +104,7 @@ class workout:
             
         return image
     
-    # Returns Specific points to be used for model
+    # Returns Specific points to be used 
     def returnPoints(self, leftCurl = False, rightCurl = False):
         if leftCurl:
             return self.leftWrist, self.leftElbow, self.leftShoulder
