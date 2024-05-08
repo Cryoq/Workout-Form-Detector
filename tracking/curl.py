@@ -33,7 +33,7 @@ class workout:
         self.prevAngle = 0
         
         self.speedList = []
-        self.form = ['Great', 'good', 'bad', 'terrible']
+        self.form = ['Great', 'good', 'bad', 'uncontrolled']
         self.formIndex = 0
     
     def setupCamera(self):
@@ -147,10 +147,7 @@ class workout:
         if self.speedList.count("Fast") > 3:
             self.formIndex += 1
         
-        form = self.form[self.formIndex]   
-            
-        if self.speedList.count("Fast") > 3:
-            form += " and Uncontrolled"
+        form = self.form[self.formIndex]
 
         return form, self.rep
     
