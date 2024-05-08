@@ -73,7 +73,9 @@ def open_camera_screen(workout) -> None:
     
     global side
     workout.setupCamera()  # Initialize camera capture
-    
+    form = ""
+    rep = ""
+
     running = True
     rightCurlPoints = np.load("data/rightCurlPoints.npy")
     leftCurlPoints = np.load("data/MLLeftCurl.npy")
@@ -106,8 +108,8 @@ def open_camera_screen(workout) -> None:
                 
             labels.clear()
             
-            formlabel = textbox("Form", form, text_font, (0,0,0), screen_width/6, screen_height-70, labels)
-            replabel = textbox("Reps", rep, text_font, (0,0,0), screen_width/2, screen_height-70, labels)             
+            formlabel = textbox("Form", form, text_font, (0,0,0), screen_width-723, screen_height-70, labels)
+            replabel = textbox("Reps", rep, text_font, (0,0,0), screen_width-225, screen_height-70, labels)
             surface.blit(background,(0,0))
             for label in labels:
                 label.update()  
@@ -115,8 +117,9 @@ def open_camera_screen(workout) -> None:
     if side == "Right Curl": 
         workout_instance.excludeLandmarks(leftArm=False)
         while running:
+            keys = pygame.key.get_pressed()
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.QUIT or keys[pygame.K_ESCAPE]:
                     running = False
                 
             # runs one frame of the workout 
@@ -141,8 +144,8 @@ def open_camera_screen(workout) -> None:
                 
             labels.clear()
             try:
-                formlabel = textbox("Form", form, text_font, (0,0,0), screen_width/6, screen_height-70, labels)
-                replabel = textbox("Reps", rep, text_font, (0,0,0), screen_width/2, screen_height-70, labels)             
+                formlabel = textbox("Form", form, text_font, (0,0,0), screen_width-723, screen_height-70, labels)
+                replabel = textbox("Reps", rep, text_font, (0,0,0), screen_width-225, screen_height-70, labels)             
                 surface.blit(background,(0,0))
                 for label in labels:
                     label.update()
@@ -157,6 +160,8 @@ screen_height = 600
 Window_Size = (screen_width, screen_width)
 
 surface = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption('Workout Form Detector')
+
 labels = []
 background = pygame.image.load("images/background.png")
 background = pygame.transform.smoothscale(background, (screen_width,screen_height))

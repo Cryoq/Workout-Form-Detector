@@ -38,7 +38,8 @@ class workout:
     
     def setupCamera(self):
         # 0 used for webcam, 1 used for seperate camera
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
+
         
     def excludeLandmarks(self,leftLeg=True, rightLeg=True, leftArm=True, rightArm=True, face=False):
         
