@@ -158,7 +158,7 @@ Window_Size = (screen_width, screen_width)
 
 surface = pygame.display.set_mode((screen_width, screen_height))
 labels = []
-background = pygame.image.load("background.png")
+background = pygame.image.load("images/background.png")
 background = pygame.transform.smoothscale(background, (screen_width,screen_height))
 
 pygame.init()
@@ -175,7 +175,7 @@ main_menu_theme.set_background_color_opacity(0.5)
 theme_bg_image = main_menu_theme.copy()
 theme_bg_image.background_color = pygame_menu.BaseImage(image_path=background_image_path)
 
-menu = pygame_menu.Menu(height=600, theme=theme_bg_image, title='Workout Form Tester', width=800)
+menu = pygame_menu.Menu(height=screen_height, theme=theme_bg_image, title='Workout Form Tester', width=screen_width)
 
 workout_instance = workout(False, True)
 
