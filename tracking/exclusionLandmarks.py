@@ -21,7 +21,8 @@ exLandmarks = [
     PoseLandmark.LEFT_PINKY,
     PoseLandmark.LEFT_SHOULDER,
     PoseLandmark.LEFT_THUMB,
-    PoseLandmark.LEFT_WRIST
+    PoseLandmark.LEFT_WRIST,
+    PoseLandmark.LEFT_INDEX
 ],
     # Right Arm Landmarks
     [
