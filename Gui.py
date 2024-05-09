@@ -140,7 +140,7 @@ main_menu_theme.set_background_color_opacity(0.5)
 theme_bg_image = main_menu_theme.copy()
 theme_bg_image.background_color = pygame_menu.BaseImage(image_path=background_image_path)
 
-menu = pygame_menu.Menu(height=screen_height, theme=theme_bg_image, title='Workout Form Tester', width=screen_width)
+menu = pygame_menu.Menu(height=screen_height, theme=theme_bg_image, title='Workout Form Detector', width=screen_width)
 
 workout_instance = workout(False, True)
 workout_instance.setupCamera()  # Initialize camera capture
