@@ -35,33 +35,14 @@ class textbox():
         surface.blit(self.surf, (self.x, self.y))
 
 def draw(frame):
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  
     frame = np.rot90(frame)
     frame = pygame.surfarray.make_surface(frame)
     surface.blit(frame, (screen_width/10, screen_height/10))
-
-def calculate_euclidean_distance(keypoints1, keypoints2):
-    # Calculate Euclidean distance between two sets of keypoints
-    return np.linalg.norm(keypoints1 - keypoints2)
-
-def calculate_distance(realtime_keypoints, dataset):
-    min_distance = float('inf')
-    
-    # Iterate through dataset
-    for data_point in dataset:
-        # Calculate distance between each dataset point and real-time keypoints
-        distance = calculate_euclidean_distance(realtime_keypoints, data_point)
-        # Check if this distance is smaller than previous min_distance
-        if distance < min_distance:
-            min_distance = distance
-            
-    return min_distance
 
 def change_side(value, *args):
     global side
     side = value[0][0]
     
-
 def text(text, font, text_color, x, y):
     put_text = font.render(text, True, text_color)
     surface.blit(put_text, (x, y))
@@ -70,15 +51,11 @@ def open_camera_screen(workout) -> None:
     """
     Function to open a new screen with camera feed.
     """
-    
     global side
-    workout.setupCamera()  # Initialize camera capture
-    form = ""
-    rep = ""
-
     running = True
     rightCurlPoints = np.load("data/rightCurlPoints.npy")
     leftCurlPoints = np.load("data/MLLeftCurl.npy")
+    
     if side == "Left Curl":
         workout_instance.excludeLandmarks(rightArm=False)
         while running:
@@ -90,15 +67,9 @@ def open_camera_screen(workout) -> None:
             frame = workout.oneFrame()
             
             try:
-                # Calculates distance between good form dataset and real time form data
-                Lwrist, Lelbow, Lshoulder = workout.returnPoints(True, False)
-                realtime_keypoints = np.array([Lwrist, Lelbow, Lshoulder])
-                distance = calculate_distance(realtime_keypoints, leftCurlPoints)
-                print("Distance", distance)
-                
-                # Gets form and reps
-                form, rep = workout.curl(distance, Lwrist, Lelbow, Lshoulder)
-            except:
+                form, rep = workout.curl(leftCurl = True, rightCurl = False, dataset = leftCurlPoints)
+            except Exception as f:
+                print(f)
                 print("Please Step into frame")
                 
             if frame is not None:
@@ -109,7 +80,7 @@ def open_camera_screen(workout) -> None:
             labels.clear()
             
             formlabel = textbox("Form", form, text_font, (0,0,0), screen_width-723, screen_height-70, labels)
-            replabel = textbox("Reps", rep, text_font, (0,0,0), screen_width-225, screen_height-70, labels)
+            replabel = textbox("Reps", rep, text_font, (0,0,0), screen_width-225, screen_height-70, labels)             
             surface.blit(background,(0,0))
             for label in labels:
                 label.update()  
@@ -117,23 +88,15 @@ def open_camera_screen(workout) -> None:
     if side == "Right Curl": 
         workout_instance.excludeLandmarks(leftArm=False)
         while running:
-            keys = pygame.key.get_pressed()
             for event in pygame.event.get():
-                if event.type == pygame.QUIT or keys[pygame.K_ESCAPE]:
+                if event.type == pygame.QUIT:
                     running = False
                 
             # runs one frame of the workout 
             frame = workout.oneFrame()
             
             try:
-                # Calculates distance between good form dataset and real time form data
-                Lwrist, Lelbow, Lshoulder = workout.returnPoints(False, True)
-                realtime_keypoints = np.array([Lwrist, Lelbow, Lshoulder])
-                distance = calculate_distance(realtime_keypoints, rightCurlPoints)
-                print("Distance", distance)
-                
-                # Gets form and reps
-                form, rep = workout.curl(distance, Lwrist, Lelbow, Lshoulder)
+                form, rep = workout.curl(leftCurl = False, rightCurl = True, dataset = rightCurlPoints)
             except:
                 print("Please Step into frame")
                 
@@ -153,6 +116,8 @@ def open_camera_screen(workout) -> None:
                 pass
 
 #### pygame ###
+button_image_path = 'images/button.png'
+background_image_path = 'images/background.png'
 
 screen_width = 800
 screen_height = 600
@@ -160,10 +125,8 @@ screen_height = 600
 Window_Size = (screen_width, screen_width)
 
 surface = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption('Workout Form Detector')
-
 labels = []
-background = pygame.image.load("images/background.png")
+background = pygame.image.load(background_image_path)
 background = pygame.transform.smoothscale(background, (screen_width,screen_height))
 
 pygame.init()
@@ -171,9 +134,6 @@ pygame.init()
 text_font = pygame.font.SysFont("Arial", 45)
             
 ### pygame Menu ###
-
-button_image_path = 'images/button.png'
-background_image_path = 'images/background.png'
 
 main_menu_theme = pygame_menu.themes.THEME_GREEN.copy()
 main_menu_theme.set_background_color_opacity(0.5)
@@ -183,6 +143,7 @@ theme_bg_image.background_color = pygame_menu.BaseImage(image_path=background_im
 menu = pygame_menu.Menu(height=screen_height, theme=theme_bg_image, title='Workout Form Tester', width=screen_width)
 
 workout_instance = workout(False, True)
+workout_instance.setupCamera()  # Initialize camera capture
 
 menu.add.dropselect(
     title='Curls',
