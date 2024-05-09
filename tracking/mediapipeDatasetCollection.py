@@ -40,7 +40,7 @@ def frontBodyTracking(videopath, debug:bool = False):
                 print("End of Video.")
                 
                 print(landmarkDataset)
-                np.save("data/TimeGoodLeftCurl.npy", np.array(landmarkDataset))
+                np.save("data/MLRightCurl.npy", np.array(landmarkDataset))
                 
                 break
 
@@ -88,4 +88,4 @@ def frontBodyTracking(videopath, debug:bool = False):
     cap.release()
     cv2.destroyAllWindows()
     
-frontBodyTracking("C:/Users/aland/OneDrive/Pictures/Camera Roll/NewLeftCurl.mp4")
+frontBodyTracking("C:/Users/aland/OneDrive/Pictures/Camera Roll/MLRightCurls.mp4")
